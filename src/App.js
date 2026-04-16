@@ -1,16 +1,28 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db } from './firebase';
 import { collection, addDoc, getDocs, query, orderBy } from 'firebase/firestore';
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import './App.css';
+
+// Map click handler component
+function MapClickHandler({ setSelectedLocation }) {
+  useMapEvents({
+    click(e) {
+      const { lat, lng } = e.latlng;
+      setSelectedLocation({ lat, lng });
+    },
+  });
+  return null;
+}
 
 function App() {
   const [posts, setPosts] = useState([]);
   const [newPost, setNewPost] = useState('');
   const [authorName, setAuthorName] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState(null);
 
   // Fetch posts from Firestore
   const fetchPosts = async () => {
@@ -40,15 +52,23 @@ function App() {
       return;
     }
 
+    if (!selectedLocation) {
+      alert('Please click on the map to select a location');
+      return;
+    }
+
     setLoading(true);
     try {
       console.log('Attempting to add post...');
       console.log('Author:', authorName);
       console.log('Content:', newPost);
+      console.log('Location:', selectedLocation);
       
       const docRef = await addDoc(collection(db, 'posts'), {
         content: newPost,
         author: authorName,
+        latitude: selectedLocation.lat,
+        longitude: selectedLocation.lng,
         createdAt: new Date(),
       });
       
@@ -56,6 +76,7 @@ function App() {
       alert('Location posted successfully!');
       setNewPost('');
       setAuthorName('');
+      setSelectedLocation(null);
       await fetchPosts(); // Refresh posts
     } catch (error) {
       console.error('Error adding post:', error);
@@ -117,6 +138,18 @@ function App() {
                 required
               />
             </div>
+            {selectedLocation && (
+              <div className="location-info">
+                <p style={{ color: '#27ae60', fontWeight: 'bold' }}>
+                  ✓ Location selected: {selectedLocation.lat.toFixed(4)}, {selectedLocation.lng.toFixed(4)}
+                </p>
+              </div>
+            )}
+            {!selectedLocation && (
+              <div className="location-info" style={{ color: '#e74c3c' }}>
+                <p>📍 Click on the map below to select a location</p>
+              </div>
+            )}
             <button 
               type="submit" 
               disabled={loading}
@@ -129,26 +162,69 @@ function App() {
 
         <section className="map-section">
           <h2>📍 Locations Map</h2>
+          <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '10px' }}>Click on the map to place your pin</p>
           <div className="map-container">
             <MapContainer center={[22.3193, 114.1694]} zoom={12} className="map">
               <TileLayer
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
               />
-              {posts.map((post) => (
+              <MapClickHandler setSelectedLocation={setSelectedLocation} />
+              
+              {/* Show temporary pin for selected location */}
+              {selectedLocation && (
                 <Marker 
-                  key={post.id} 
-                  position={[22.3193 + (Math.random() - 0.5) * 0.2, 114.1694 + (Math.random() - 0.5) * 0.2]}
-                  icon={defaultIcon}
+                  position={[selectedLocation.lat, selectedLocation.lng]}
+                  icon={L.icon({
+                    iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                    shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                    iconSize: [25, 41],
+                    iconAnchor: [12, 41],
+                    popupAnchor: [1, -34],
+                    shadowSize: [41, 41],
+                    className: 'pending-marker'
+                  })}
                 >
                   <Popup>
                     <div>
-                      <strong>{post.author}</strong>
-                      <p>{post.content}</p>
+                      <strong>New Location (Pending)</strong>
+                      <p>Lat: {selectedLocation.lat.toFixed(6)}</p>
+                      <p>Lng: {selectedLocation.lng.toFixed(6)}</p>
                     </div>
                   </Popup>
                 </Marker>
-              ))}
+              )}
+
+              {/* Show existing posts */}
+              {posts.map((post) => {
+                // Only show markers if latitude and longitude are defined
+                if (!post.latitude || !post.longitude) {
+                  return null;
+                }
+                return (
+                  <Marker 
+                    key={post.id} 
+                    position={[post.latitude, post.longitude]}
+                    icon={L.icon({
+                      iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
+                      shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png',
+                      iconSize: [25, 41],
+                      iconAnchor: [12, 41],
+                      popupAnchor: [1, -34],
+                      shadowSize: [41, 41]
+                    })}
+                  >
+                    <Popup>
+                      <div>
+                        <strong>{post.author}</strong>
+                        <p>{post.content}</p>
+                        <small>Lat: {post.latitude?.toFixed(6)}</small><br/>
+                        <small>Lng: {post.longitude?.toFixed(6)}</small>
+                      </div>
+                    </Popup>
+                  </Marker>
+                );
+              })}
             </MapContainer>
           </div>
         </section>
@@ -170,6 +246,11 @@ function App() {
                   <div className="post-content">
                     {post.content}
                   </div>
+                  {post.latitude && post.longitude && (
+                    <div className="post-coordinates" style={{ marginTop: '8px', fontSize: '0.85em', color: '#7f8c8d' }}>
+                      📍 Coordinates: {post.latitude?.toFixed(6)}, {post.longitude?.toFixed(6)}
+                    </div>
+                  )}
                 </div>
               ))}
             </div>
