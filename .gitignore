@@ -1,44 +1,20 @@
-# Dependencies
+firebase.js
+
 node_modules/
-/.pnp
+.pnp/
 .pnp.js
-
-# Testing
-/coverage
-
-# Production
-/build
-/dist
-
-# Misc
 .DS_Store
-.env
+
+# testing
+coverage/
+
+# production
+build/
+
+# misc
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
-
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
-.project
-.classpath
-.c9/
-*.launch
-.settings/
-*.sublime-workspace
-
-# OS
-Thumbs.db
-
-# Firebase config (IMPORTANT - Keep sensitive keys private!)
-firebase.js
-.firebaserc
-firebase-debug.log
