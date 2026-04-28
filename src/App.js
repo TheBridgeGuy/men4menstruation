@@ -102,20 +102,46 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🩸 Men for Menstruation (Temp)</h1>
-        <p>Spreading awareness, easing periods, supporting the HK girlies</p>
+        <div className="header-inner" style={{maxWidth: 1000, margin: '0 auto'}}>
+          <div className="brand" style={{display: 'flex', alignItems: 'center', gap: 12, justifyContent: 'space-between'}}>
+            <div style={{display: 'flex', alignItems: 'center', gap: 12}}>
+              <div style={{width: 44, height: 44, borderRadius: 8, background: '#0b74c9', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontWeight: 700}}>M4M</div>
+              <div>
+                <h1 style={{margin: 0}}>Men for Menstruation</h1>
+                <div style={{fontSize: '0.95rem', color: '#6b7280'}}>Community-sourced free period product locations</div>
+              </div>
+            </div>
+            <nav style={{display: 'flex', gap: 14, alignItems: 'center'}}>
+              <a href="#mission" style={{color: '#0b3d91', textDecoration: 'none', fontWeight: 600}}>Mission</a>
+              <a href="#map" style={{color: '#475569', textDecoration: 'none'}}>Map</a>
+              <a href="#community" style={{color: '#475569', textDecoration: 'none'}}>Community</a>
+            </nav>
+          </div>
+        </div>
       </header>
 
       <main className="main-content">
-        <section className="about-section">
+        <section id="mission" className="section">
           <h2>Our Mission</h2>
           <p>
-            We're working to normalize conversations about menstruation and ensure 
-            everyone has access to period products and education. 
+            We normalize conversations about menstruation, reduce stigma, and
+            expand access to free period products through community-sourced
+            locations and education. Our goal is practical support paired with
+            kindness — making period care accessible to everyone who needs it.
           </p>
+          <div style={{display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap'}}>
+            <div style={{background: '#f8fafc', padding: 12, borderRadius: 8, minWidth: 160}}>
+              <div style={{fontSize: '1.25rem', fontWeight: 700, color: '#0b3d91'}}>{posts.length}</div>
+              <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Locations shared</div>
+            </div>
+            <div style={{background: '#f8fafc', padding: 12, borderRadius: 8, minWidth: 160}}>
+              <div style={{fontSize: '1.25rem', fontWeight: 700, color: '#0b3d91'}}>Free</div>
+              <div style={{fontSize: '0.9rem', color: '#6b7280'}}>Community-driven</div>
+            </div>
+          </div>
         </section>
 
-        <section className="post-form-section">
+        <section className="section">
           <h2>Free Period Product Locations</h2>
           <form onSubmit={handleSubmit} className="post-form">
             <div className="form-group">
@@ -138,16 +164,15 @@ function App() {
                 required
               />
             </div>
-            {selectedLocation && (
+            {selectedLocation ? (
               <div className="location-info">
-                <p style={{ color: '#27ae60', fontWeight: 'bold' }}>
-                  ✓ Location selected: {selectedLocation.lat.toFixed(4)}, {selectedLocation.lng.toFixed(4)}
+                <p style={{ color: '#059669', fontWeight: '600' }}>
+                  Location selected: {selectedLocation.lat.toFixed(4)}, {selectedLocation.lng.toFixed(4)}
                 </p>
               </div>
-            )}
-            {!selectedLocation && (
-              <div className="location-info" style={{ color: '#e74c3c' }}>
-                <p>📍 Click on the map below to select a location</p>
+            ) : (
+              <div className="location-info" style={{ color: '#ca3e47' }}>
+                <p>Please click on the map to choose the location you want to share.</p>
               </div>
             )}
             <button 
@@ -155,14 +180,14 @@ function App() {
               disabled={loading}
               className="submit-btn"
             >
-              {loading ? 'Posting...' : 'Share Post'}
+              {loading ? 'Posting...' : 'Share location'}
             </button>
           </form>
         </section>
 
-        <section className="map-section">
-          <h2>📍 Locations Map</h2>
-          <p style={{ fontSize: '0.9em', color: '#666', marginBottom: '10px' }}>Click on the map to place your pin</p>
+        <section id="map" className="section">
+          <h2>Locations Map</h2>
+          <p style={{ fontSize: '0.95rem', color: '#6b7280', marginBottom: '10px' }}>Click on the map to place your pin and share a location.</p>
           <div className="map-container">
             <MapContainer center={[22.3193, 114.1694]} zoom={12} className="map">
               <TileLayer
@@ -229,7 +254,7 @@ function App() {
           </div>
         </section>
 
-        <section className="posts-section">
+        <section id="community" className="section">
           <h2>Community Posts</h2>
           {posts.length === 0 ? (
             <p className="no-posts">No posts yet. Be the first to share!</p>
