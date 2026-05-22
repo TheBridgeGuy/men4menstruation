@@ -3,7 +3,7 @@
 
 
 # For future students:
-#​ In the web app's current state, pinning a location and
+In the web app's current state, pinning a location and
 writing a description for that locations works. The client
 requested that that an account system is put into place,
 to prevent people from spreading misinformation.
