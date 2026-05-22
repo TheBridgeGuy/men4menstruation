@@ -16,9 +16,10 @@ firebase database key is in the history, so it is best if you create a
 new one. Remember not to publicly post the key, and make sure you
 include a .gitignore. ​​
 
-​
+​**Additional Information:**
+You could potentially get the For Girls club involved; they also have funding
 
-Summary Roadmap:​
+**Summary Roadmap:**​
 - Setup account system​
 - Add a rating and comment section to each existing location ​
 - Try to implement a location system, so the pin is automatically on
