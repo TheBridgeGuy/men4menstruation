@@ -19,7 +19,7 @@ include a .gitignore. ​​
 ​**Additional Information:**
 You could potentially get the For Girls club involved; they also have funding
 
-**Summary Roadmap:**​
+**Summary Roadmap**:​
 - Setup account system​
 - Add a rating and comment section to each existing location ​
 - Try to implement a location system, so the pin is automatically on
